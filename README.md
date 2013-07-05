@@ -1,6 +1,6 @@
 DannyChoo.com Post Scraper v0.1.0
 =================================
-DannyChoo.com Post Scraper (*dc_post_scraper*) is a PHP library that allows you to glean data from DannyChoo.com and store it in a MySQL database.  
+DannyChoo.com Post Scraper is a PHP library that allows you to glean data from DannyChoo.com and store it in a MySQL database.  
 
 It is part of a bigger project that will offer a RESTful API to gather DannyChoo.com post info.
 
@@ -12,6 +12,7 @@ Data Gathered
 - Post Publish Date
 - Post Category  
 - Category URL
+- Tag Name (future addition)
 
 *This library does NOT gather post images or content!*
 
