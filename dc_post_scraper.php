@@ -118,9 +118,9 @@ foreach ($posts as $post) {
         Get category info.  Example:
         <div class="category"><a href="/en/posts/category/booth">Culture Japan Booth</a></div>
      */
-    $categoryInfo = $html->find('div[class=category]', 0);
+    $categoryInfo = $html->find('div[class=category]', 0)->find('a', 0);
     if (is_object($categoryInfo)) {
-        if (strpos($categoryInfo->find('a', 0)->href, "/en/posts/category") !== false) {
+        if (strpos($categoryInfo->href, "/en/posts/category") !== false) {
             $catUrl = $categoryInfo->href;
             $catName = $categoryInfo->plaintext;
             $catId = $dcApi->addCategory($catName, $catUrl);
