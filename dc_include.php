@@ -36,7 +36,7 @@ define("DB_PASSWORD", "DATABASE PASSWORD");
 
 /*
  Determines how many archive pages to scan.  You can get the total number of 
- archive pages by going to http://www.dannychoo.com/page/en/post/all/all/all/all/all/all/1.html.
+ archive pages by going to http://www.dannychoo.com/en/posts/page/1.
 */
 define("PAGE_DEPTH", "1");
 
@@ -62,10 +62,9 @@ class DC_API {
 	 * @param string $title 
 	 * @param string $url
 	 */
-	function addPost($title, $uri)
+	function addPost($title, $url)
 	{
 		// We're only getting the URI.  We need to add the hostname.
-		$url = "http://www.dannychoo.com" . $uri;
 		$q =  "INSERT IGNORE INTO `posts` " .
 			"(`title`, `url`, `first_found`, `last_updated`) " .
 			"VALUES " . 

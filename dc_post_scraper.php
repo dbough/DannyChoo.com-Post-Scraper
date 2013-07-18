@@ -27,7 +27,7 @@
 // Required library
 include "dc_include.php";
 
-//The DC_API class holds methods we'll need.
+// The DC_API class holds methods we'll need.
 $dcApi = new DC_API();
 
 /*
@@ -35,12 +35,12 @@ $dcApi = new DC_API();
     The PAGE_DEPTH global determines how many archive pages we scrape - default is 1.
     You can browse to the first page of the archive to determine how many total pages there are:
 
-    http://www.dannychoo.com/page/en/post/all/all/all/all/all/all/1.html
+    http://www.dannychoo.com/en/posts/page/1 
 
  */
 for($i=1;$i<=PAGE_DEPTH;$i++) {
     // Create an object out HTML
-    $html = file_get_html('http://www.dannychoo.com/page/en/post/all/all/all/all/all/all/' . $i . '.html');
+    $html = file_get_html('http://www.dannychoo.com/en/posts/page/' . $i);
 
     /*
       We now look for list elements with a class name that starts with "post-".  Example element:
@@ -100,7 +100,7 @@ $posts = $dcApi->getUnprocessedPosts();
 
 foreach ($posts as $post) {
     // Build an object from html
-    $html = file_get_html($post['url']);
+    $html = file_get_html("http://www.dannychoo.com" . $post['url']);
 
     /*
        Get the post description.  Example:
