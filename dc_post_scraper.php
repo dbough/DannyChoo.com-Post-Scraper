@@ -73,7 +73,7 @@ for($i=1;$i<=PAGE_DEPTH;$i++) {
             <a href="/en/post/26974/Anime+Festival+Asia+Indonesia+2013.html" class="thumbnail post" style="width:75px;height:75px;" title="Anime Festival Asia Indonesia 2013">
          */
         $a = $element->find('a[class="thumbnail post"]');
-        if ($a && $a[0]->title && !strpos($a->href, "The+page+you+was+looking+for+was+eaten+but+check+these+out+instead")) {
+        if ($a && $a[0]->title && !strpos($a[0]->href, "The+page+you+was+looking+for+was+eaten+but+check+these+out+instead")) {
             $title = $a[0]->title;
             $url = $a[0]->href;
         }
@@ -82,10 +82,15 @@ for($i=1;$i<=PAGE_DEPTH;$i++) {
         // @todo - Add error logging.
         $dcApi->addPost($title, $url);
     }
+
+    /*
+        Clear the last $html object.  Needed due to a 
+        PHP 5 memory leak:  http://simplehtmldom.sourceforge.net/manual_faq.htm#memory_leak
+     */
+    $html->clear();
+    unset($html);
 }
 
-// Clear out our last html object.
-$html->clear();
 
 /*
     Now that we've populated basic post data we need to fill in the gaps.
@@ -113,12 +118,14 @@ foreach ($posts as $post) {
         Get category info.  Example:
         <div class="category"><a href="/en/posts/category/booth">Culture Japan Booth</a></div>
      */
-    $categoryInfo = $html->find('div[class=category]', 0)->find('a', 0);
-    if (strpos($categoryInfo->href, "/en/posts/category") !== false) {
-        $catUrl = $categoryInfo->href;
-        $catName = $categoryInfo->plaintext;
+    $categoryInfo = $html->find('div[class=category]', 0);
+    if (is_object($categoryInfo)) {
+        if (strpos($categoryInfo->find('a', 0)->href, "/en/posts/category") !== false) {
+            $catUrl = $categoryInfo->href;
+            $catName = $categoryInfo->plaintext;
+        }
+        $catId = $dcApi->addCategory($catName, $catUrl);
     }
-    $catId = $dcApi->addCategory($catName, $catUrl);
     
     /*
         Get create date as a unix timestamp.  Example:
@@ -128,5 +135,12 @@ foreach ($posts as $post) {
 
     // Update post with new data.
     $dcApi->updatePost($post['id'], $desc, $catId, $date);
+
+    /*
+        Clear the last $html object.  Needed due to a 
+        PHP 5 memory leak:  http://simplehtmldom.sourceforge.net/manual_faq.htm#memory_leak
+     */
+    $html->clear();
+    unset($html);
 }
 
