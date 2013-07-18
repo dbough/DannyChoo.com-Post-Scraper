@@ -12,7 +12,6 @@ Data Gathered
 - Post Publish Date
 - Post Category  
 - Category URL
-- Tag Name (future addition)
 
 *This library does NOT gather post images or content!*
 

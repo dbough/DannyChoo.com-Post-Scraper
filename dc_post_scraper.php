@@ -123,8 +123,8 @@ foreach ($posts as $post) {
         if (strpos($categoryInfo->find('a', 0)->href, "/en/posts/category") !== false) {
             $catUrl = $categoryInfo->href;
             $catName = $categoryInfo->plaintext;
+            $catId = $dcApi->addCategory($catName, $catUrl);
         }
-        $catId = $dcApi->addCategory($catName, $catUrl);
     }
     
     /*
