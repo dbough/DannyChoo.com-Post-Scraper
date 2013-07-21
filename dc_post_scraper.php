@@ -119,25 +119,31 @@ foreach ($posts as $post) {
         <div class="category"><a href="/en/posts/category/booth">Culture Japan Booth</a></div>
      */
     $category = $html->find('div[class=category]', 0);
-    if (is_object($category)) {
-        $categoryInfo = $category->find('a', 0);
-    }
+    $categoryInfo = (is_object($category)) ? $category->find('a', 0) : NULL;
+    
     if ($categoryInfo && is_object($categoryInfo)) {
         if (strpos($categoryInfo->href, "/en/posts/category") !== false) {
             $catUrl = $categoryInfo->href;
             $catName = $categoryInfo->plaintext;
-            $catId = $dcApi->addCategory($catName, $catUrl);
+            // We only want category info if the URL AND Name exist.
+            if ($catUrl && $catName) {
+                $catId = $dcApi->addCategory($catName, $catUrl);
+            }
         }
+    }
+    else {
+        $catId = NULL;
     }
     
     /*
         Get create date as a unix timestamp.  Example:
         <div class="published-at">Wed 2013/07/03 04:37 JST</div>
      */
-    $date = strtotime($html->find('div[class="published-at"]', 0)->plaintext);
+    $date = $html->find('div[class="published-at"]', 0);
+    $createDate = (is_object($date)) ? strtotime($date->plaintext) : NULL;
 
     // Update post with new data.
-    $dcApi->updatePost($post['id'], $desc, $catId, $date);
+    $dcApi->updatePost($post['id'], $desc, $catId, $createDate);
 
     /*
         Clear the last $html object.  Needed due to a 
