@@ -39,8 +39,29 @@ $dcApi = new DC_API();
 
  */
 for($i=1;$i<=PAGE_DEPTH;$i++) {
+    if ($i == 1) {
+        $url = "http://www.dannychoo.com/en/posts";
+    }
+    else {
+        $url = "http://www.dannychoo.com/en/posts/page/" . $i;
+    }
+
+    // Make sure web page exists.
+    $urlExists = $dcApi->checkUrl($url);
+    if (!$urlExists) {
+        continue;
+    }
+
     // Create an object out HTML
-    $html = file_get_html('http://www.dannychoo.com/en/posts/page/' . $i);
+    $html = file_get_html($url);
+
+    /*
+        We want to stop this loop if there is a problem getting 
+        html.  Prevents fatal errors.
+    */
+    if (!$html || !is_object($html)) {
+        continue;
+    }
 
     /*
       We now look for list elements with a class name that starts with "post-".  Example element:
@@ -58,13 +79,14 @@ for($i=1;$i<=PAGE_DEPTH;$i++) {
         </li>
      */
     foreach($html->find('li[class^="post-"]') as $element) {
+
         /*
             Some list elements contain the "with-badge" class.  We don't want info from those!
 
             <li class="post-26974 with-badge">
          */
         if (strpos($element->class, "with-badge")) {
-            break;
+            continue;
         }
 
         /*
@@ -73,14 +95,15 @@ for($i=1;$i<=PAGE_DEPTH;$i++) {
             <a href="/en/post/26974/Anime+Festival+Asia+Indonesia+2013.html" class="thumbnail post" style="width:75px;height:75px;" title="Anime Festival Asia Indonesia 2013">
          */
         $a = $element->find('a[class="thumbnail post"]');
-        if ($a && $a[0]->title && !strpos($a[0]->href, "The+page+you+was+looking+for+was+eaten+but+check+these+out+instead")) {
+        if ($a && $a[0]->title) {
             $title = $a[0]->title;
             $url = $a[0]->href;
         }
 
-        // Insert results into the database
-        // @todo - Add error logging.
-        $dcApi->addPost($title, $url);
+        // Insert results into the database.
+        if ($title && $dcApi->checkUrl($url)) {
+            $dcApi->addPost($title, $url);
+        }
     }
 
     /*
@@ -99,8 +122,26 @@ for($i=1;$i<=PAGE_DEPTH;$i++) {
 $posts = $dcApi->getUnprocessedPosts();
 
 foreach ($posts as $post) {
+    $url = "http://www.dannychoo.com" . $post['url'];
+
+    // Make sure web page exists.
+    $urlExists = $dcApi->checkUrl($url);
+    if (!$urlExists) {
+        // If it doesn't, delete it from the posts table.
+        $dcApi->deletePost($post['id']);
+        continue;
+    }
+
     // Build an object from html
-    $html = file_get_html("http://www.dannychoo.com" . $post['url']);
+    $html = file_get_html($url);
+    
+    /*
+        We want to stop this loop if there is a problem getting 
+        html.  Prevents fatal errors.
+     */
+    if (!$html || !is_object($html)) {
+        continue;
+    }
 
     /*
        Get the post description.  Example:
@@ -110,8 +151,8 @@ foreach ($posts as $post) {
        The reason is that there is so much going on at AX that one cant 
        possibly be ready for the onslaught of Japanese animation, industry guests, concerts, merchandise, panels.
        We expect about 130,000 attende..."> 
-
      */
+
     $desc = $html->find('meta[name=description]', 0)->content;
 
     /*

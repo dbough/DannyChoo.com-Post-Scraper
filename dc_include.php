@@ -152,6 +152,34 @@ class DC_API {
 
 		$sth = $this->dbh->prepare($q);
 		$sth->execute(array($desc, $catId, $date, time(), $id));
+	}
 
+	/**
+	 * Determine if URL is accessible.
+	 * @param  string $url
+	 * @return bool
+	 */
+	function checkUrl($url)
+	{
+		$headers = @get_headers($url);
+		if ($headers[0] == "HTTP/1.1 200 OK") {
+			return true;
+		} 
+		else {
+			return false;
+		}
+	}
+
+	/**
+	 * Delete a post.
+	 * @param  int $id
+	 */
+	function deletePost($id)
+	{
+		$q = "DELETE FROM `posts` " .
+			"WHERE `id` = ?";
+
+		$sth = $this->dbh->prepare($q);
+		$sth->execute(array($id));
 	}
 }
