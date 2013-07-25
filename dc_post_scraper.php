@@ -97,12 +97,12 @@ for($i=1;$i<=PAGE_DEPTH;$i++) {
         $a = $element->find('a[class="thumbnail post"]');
         if ($a && $a[0]->title) {
             $title = $a[0]->title;
-            $url = $a[0]->href;
+            $postUrl = $a[0]->href;
         }
 
         // Insert results into the database.
-        if ($title && $dcApi->checkUrl($url)) {
-            $dcApi->addPost($title, $url);
+        if ($title && $dcApi->checkUrl("http://www.dannychoo.com" . $postUrl)) {
+            $dcApi->addPost($title, $postUrl);
         }
     }
 
