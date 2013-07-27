@@ -54,7 +54,7 @@ class DC_API {
 		 * Database handle.
 		 * @var object
 		 */
-		$this->dbh = new PDO(DB_DSN, DB_USERNAME, DB_PASSWORD);;
+		$this->dbh = new PDO(DB_DSN, DB_USERNAME, DB_PASSWORD);
 	}
 
 	/**
