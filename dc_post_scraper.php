@@ -28,7 +28,7 @@
 include "dc_include.php";
 
 // The DC_API class holds methods we'll need.
-$dcApi = new DC_API();
+$dcps = new DCPS();
 
 /*
     First we want to gather URLs and titles.  
@@ -47,7 +47,7 @@ for($i=1;$i<=PAGE_DEPTH;$i++) {
     }
 
     // Make sure web page exists.
-    $urlExists = $dcApi->checkUrl($url);
+    $urlExists = $dcps->checkUrl($url);
     if (!$urlExists) {
         continue;
     }
@@ -101,8 +101,8 @@ for($i=1;$i<=PAGE_DEPTH;$i++) {
         }
 
         // Insert results into the database.
-        if ($title && $dcApi->checkUrl("http://www.dannychoo.com" . $postUrl)) {
-            $dcApi->addPost($title, $postUrl);
+        if ($title && $dcps->checkUrl("http://www.dannychoo.com" . $postUrl)) {
+            $dcps->addPost($title, $postUrl);
         }
     }
 
@@ -119,16 +119,16 @@ for($i=1;$i<=PAGE_DEPTH;$i++) {
     Now that we've populated basic post data we need to fill in the gaps.
     Build an array of post IDs and URLs that do not have create dates or descriptions.  
 */
-$posts = $dcApi->getUnprocessedPosts();
+$posts = $dcps->getUnprocessedPosts();
 
 foreach ($posts as $post) {
     $url = "http://www.dannychoo.com" . $post['url'];
 
     // Make sure web page exists.
-    $urlExists = $dcApi->checkUrl($url);
+    $urlExists = $dcps->checkUrl($url);
     if (!$urlExists) {
         // If it doesn't, delete it from the posts table.
-        $dcApi->deletePost($post['id']);
+        $dcps->deletePost($post['id']);
         continue;
     }
 
@@ -168,7 +168,7 @@ foreach ($posts as $post) {
             $catName = $categoryInfo->plaintext;
             // We only want category info if the URL AND Name exist.
             if ($catUrl && $catName) {
-                $catId = $dcApi->addCategory($catName, $catUrl);
+                $catId = $dcps->addCategory($catName, $catUrl);
             }
         }
     }
@@ -184,7 +184,7 @@ foreach ($posts as $post) {
     $createDate = (is_object($date)) ? strtotime($date->plaintext) : NULL;
 
     // Update post with new data.
-    $dcApi->updatePost($post['id'], $desc, $catId, $createDate);
+    $dcps->updatePost($post['id'], $desc, $catId, $createDate);
 
     /*
         Clear the last $html object.  Needed due to a 

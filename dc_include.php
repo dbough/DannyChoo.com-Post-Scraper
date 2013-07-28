@@ -40,7 +40,7 @@ define("DB_PASSWORD", "DATABASE PASSWORD");
 */
 define("PAGE_DEPTH", "1");
 
-class DC_API {
+class DCPS {
 
 	/**
 	 * Holds database object
@@ -64,11 +64,21 @@ class DC_API {
 	 */
 	function addPost($title, $url)
 	{
-		// We're only getting the URI.  We need to add the hostname.
+		 /*
+		 	If we try to add a duplicate we set the 
+			desc. and title to NULL.
+		 	This will force dc_post_scaper to update other data
+		 	about the post.
+		 	I chose to do this because Danny reposted an article
+		 	which made the create_date wrong.
+		*/
 		$q =  "INSERT IGNORE INTO `posts` " .
 			"(`title`, `url`, `first_found`, `last_updated`) " .
 			"VALUES " . 
-			"(?, ?, ?, ?)";
+			"(?, ?, ?, ?) " . 
+			"ON DUPLICATE KEY " .
+			"UPDATE `description` = NULL, " . 
+			"`create_date` = NULL";
 
 		$sth = $this->dbh->prepare($q);
 		$sth->execute(array($title, $url, time(), time()));

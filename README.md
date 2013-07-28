@@ -23,7 +23,8 @@ http://www.danielbough.com
 
 License
 -------
-This software is free to use under the GPLv3 license.
+This software is free to use under the GPL license.  
+http://www.gnu.org/licenses/gpl-3.0.txt
 
 Requirements
 ------------
@@ -41,6 +42,7 @@ Notes
 -----
 - You can adjust the number of archive pages scanned by updating the `PAGE_DEPTH` global variable in dc_include.php.  The default is 1, however there are (at the time of this writing) at least 179 pages. 
 - The more archive pages you scan at a time, the longer this script will take.  There are nearly 6000 posts - it could take a few hours to parse them all.  If you don't mind waiting, I'd set the `PAGE_DEPTH` variable to the max number of pages, run the script, and walk away.  After you have them all, change the `PAGE_DEPTH` to 1 and run the script once per day.
+- I'm in the middle of creating an RESTful API so you can get this data via HTTP.  Check out `http://dc-api.gopagoda.com/api/v1/latest` for an example. (This could change at anytime!)
 
 
 
