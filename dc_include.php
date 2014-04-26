@@ -5,7 +5,7 @@
  * Globals and a class needed by dc_post_scraper.php 
  *
  * @author Dan Bough daniel.bough@gmail.com / http://www.danielbough.com
- * @copyright Copyright (C) 2010-2014
+ * @copyright Copyright (C) 2013-2014
  * @version  0.2.0
  *
  * This program is free software; you can redistribute it and/or modify

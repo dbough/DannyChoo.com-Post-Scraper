@@ -5,7 +5,7 @@
  * Gets post data from DannyChoo.com and stores it in a MySQL database.
  *
  * @author Dan Bough daniel.bough@gmail.com / http://www.danielbough.com
- * @copyright Copyright (C) 2010-2014
+ * @copyright Copyright (C) 2013-2014
  * @version  0.2.0
  *
  * This program is free software; you can redistribute it and/or modify
