@@ -44,6 +44,7 @@ CREATE TABLE `posts` (
   `description` text COLLATE utf8_bin,
   `create_date` int(11) DEFAULT NULL,
   `url` varchar(2083) COLLATE utf8_bin DEFAULT NULL,
+  `photo_url` varchar(2083) COLLATE utf8_bin DEFAULT NULL,
   `category_id` int(11) DEFAULT NULL,
   `first_found` int(11) DEFAULT NULL,
   `last_updated` int(11) DEFAULT NULL,

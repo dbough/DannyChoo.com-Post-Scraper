@@ -1,4 +1,4 @@
-DannyChoo.com Post Scraper v0.1.0
+DannyChoo.com Post Scraper v0.2.0
 =================================
 DannyChoo.com Post Scraper is a PHP library that allows you to glean data from DannyChoo.com and store it in a MySQL database.  
 
@@ -12,8 +12,7 @@ Data Gathered
 - Post Publish Date
 - Post Category  
 - Category URL
-
-*This library does NOT gather post images or content!*
+- First Photo URL
 
 Author
 ------
@@ -42,6 +41,9 @@ Notes
 -----
 - You can adjust the number of archive pages scanned by updating the `PAGE_DEPTH` global variable in dc_include.php.  The default is 1, however there are (at the time of this writing) at least 179 pages. 
 - The more archive pages you scan at a time, the longer this script will take.  There are nearly 6000 posts - it could take a few hours to parse them all.  If you don't mind waiting, I'd set the `PAGE_DEPTH` variable to the max number of pages, run the script, and walk away.  After you have them all, change the `PAGE_DEPTH` to 1 and run the script once per day.
+- It takes approximately 5 minutes to scrape & store 1 archive page worth of posts (36 max).
 
+Changelog
+---------
 
-
+- v0.2.0 - Added code to grab the first photo url of a post.  Cleaned up some typo-s.

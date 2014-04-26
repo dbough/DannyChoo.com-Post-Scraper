@@ -82,7 +82,6 @@ for($i=1;$i<=PAGE_DEPTH;$i++) {
 
         /*
             Some list elements contain the "with-badge" class.  We don't want info from those!
-
             <li class="post-26974 with-badge">
          */
         if (strpos($element->class, "with-badge")) {
@@ -91,7 +90,6 @@ for($i=1;$i<=PAGE_DEPTH;$i++) {
 
         /*
             The URL and Title can be retreived from an anchor element with the "thumbnail post" class:
-
             <a href="/en/post/26974/Anime+Festival+Asia+Indonesia+2013.html" class="thumbnail post" style="width:75px;height:75px;" title="Anime Festival Asia Indonesia 2013">
          */
         $a = $element->find('a[class="thumbnail post"]');
@@ -183,8 +181,15 @@ foreach ($posts as $post) {
     $date = $html->find('div[class="published-at"]', 0);
     $createDate = (is_object($date)) ? strtotime($date->plaintext) : NULL;
 
+    /*
+        Get the url of the first photo in the post
+        <img alt="8137536450_8d09b94cb7_o" class="main" height="523" src="http://farm9.static.flickr.com/8045/8137536450_8d09b94cb7_o.jpg" width="930" />
+     */
+    $photo = $html->find('img[class="main"]', 0);
+    $photoUrl = ($photo && is_object($photo)) ? $photo->src : NULL;
+
     // Update post with new data.
-    $dcps->updatePost($post['id'], $desc, $catId, $createDate);
+    $dcps->updatePost($post['id'], $desc, $photoUrl, $catId, $createDate);
 
     /*
         Clear the last $html object.  Needed due to a 
@@ -193,4 +198,3 @@ foreach ($posts as $post) {
     $html->clear();
     unset($html);
 }
-

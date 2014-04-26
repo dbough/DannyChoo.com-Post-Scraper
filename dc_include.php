@@ -67,7 +67,7 @@ class DCPS {
 		 /*
 		 	If we try to add a duplicate we set the 
 			desc. and title to NULL.
-		 	This will force dc_post_scaper to update other data
+		 	This will force dc_post_scraper to update other data
 		 	about the post.
 		 	I chose to do this because Danny reposted an article
 		 	which made the create_date wrong.
@@ -148,20 +148,22 @@ class DCPS {
 	 * Update post with meta data.
 	 * @param  int $id
 	 * @param  string $desc
+	 * @param  string $photoUrl
 	 * @param  int $catId
 	 * @param  int $date
 	 */
-	function updatePost($id, $desc, $catId, $date)
+	function updatePost($id, $desc, $photoUrl, $catId, $date)
 	{
 		$q = "UPDATE `posts` SET " .
 			"`description` = ?, " .
+			"`photo_url` = ?, " .
 			"`category_id` = ?, " .
 			"`create_date` = ?, " .
 			"`last_updated` = ? " .
 			"WHERE `id` = ?";
 
 		$sth = $this->dbh->prepare($q);
-		$sth->execute(array($desc, $catId, $date, time(), $id));
+		$sth->execute(array($desc, $photoUrl, $catId, $date, time(), $id));
 	}
 
 	/**
