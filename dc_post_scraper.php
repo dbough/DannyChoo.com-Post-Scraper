@@ -156,8 +156,13 @@ foreach ($posts as $post) {
     /*
         Get category info.  Example:
         <div class="category"><a href="/en/posts/category/booth">Culture Japan Booth</a></div>
+
+        OR
+
+        <div class="category-trail"><a href="/en/posts/category/visit">Places to visit in Japan</a></div>
      */
-    $category = $html->find('div[class=category]', 0);
+    $category = ( $html->find('div[class=category]', 0) ) ? $html->find('div[class=category]', 0) : $html->find('div[class=category-trail]', 0);
+
     $categoryInfo = (is_object($category)) ? $category->find('a', 0) : NULL;
     
     if ($categoryInfo && is_object($categoryInfo)) {
