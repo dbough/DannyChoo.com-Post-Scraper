@@ -1,4 +1,4 @@
-DannyChoo.com Post Scraper v0.2.0
+DannyChoo.com Post Scraper v0.2.1
 =================================
 DannyChoo.com Post Scraper is a PHP library that allows you to glean data from DannyChoo.com and store it in a MySQL database.  
 
@@ -35,7 +35,7 @@ Instructions
 - Download the latest version of PHP Simple HTML DOM Parser from http://sourceforge.net/projects/simplehtmldom/files/, which, at the time of this writing, is 1.5.  This should be stored in the same location as `dc_include.php` and `dc_post_scraper.php`. (If you'd like to store it somewhere else, you will need to change the path at the top of `dc_include.php`).
 - Add your MySQL database info to `dc_include.php`.
 - Create a MySQL database (InnoDB) and import the table structure in `dc_scraper_database.sql`.
-- Run `dc_post_scrapper.php`.
+- Run `dc_post_scrapper.php` (add `-d` for debug output).
 
 Notes
 -----
@@ -46,4 +46,11 @@ Notes
 Changelog
 ---------
 
-- v0.2.0 - Added code to grab the first photo url of a post.  Cleaned up some typo-s.
+**v0.2.1**
+
+- Change the format of the Changelog section of the README file.
+- Fixed a few bugs caused by HTML changes on DannyChoo.com.
+- Added basic debug functionality to `dc_post_scraper.php`
+
+**v0.2.0**
+- Added code to grab the first photo url of a post.  Cleaned up some typo-s.

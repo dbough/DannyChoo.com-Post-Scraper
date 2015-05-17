@@ -5,8 +5,8 @@
  * Gets post data from DannyChoo.com and stores it in a MySQL database.
  *
  * @author Dan Bough daniel.bough@gmail.com / http://www.danielbough.com
- * @copyright Copyright (C) 2013-2014
- * @version  0.2.0
+ * @copyright Copyright (C) 2013-2015
+ * @version  0.2.1
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,6 +27,10 @@
 // Required library
 include "dc_include.php";
 
+$options = getopt('d');
+
+$debug = (isset($options['d'])) ? true : false;
+
 // The DC_API class holds methods we'll need.
 $dcps = new DCPS();
 
@@ -38,6 +42,7 @@ $dcps = new DCPS();
     http://www.dannychoo.com/en/posts/page/1 
 
  */
+if ($debug) error_log("PAGE_DEPTH:  " . PAGE_DEPTH);
 for($i=1;$i<=PAGE_DEPTH;$i++) {
     if ($i == 1) {
         $url = "http://www.dannychoo.com/en/posts";
@@ -46,61 +51,68 @@ for($i=1;$i<=PAGE_DEPTH;$i++) {
         $url = "http://www.dannychoo.com/en/posts/page/" . $i;
     }
 
+    if ($debug) error_log("Checking archive page for posts.  url: " . $url);
+
     // Make sure web page exists.
     $urlExists = $dcps->checkUrl($url);
     if (!$urlExists) {
+        if ($debug) error_log("url: " . $url . " does not exist!  Moving on.");
+        if (PAGE_DEPTH >= $i) {
+            if ($debug) error_log("Done.");
+            exit;
+        }
         continue;
     }
 
     // Create an object out HTML
-    $html = file_get_html($url);
+    $html = new simple_html_dom();
+    $html->load_file($url);
 
     /*
         We want to stop this loop if there is a problem getting 
         html.  Prevents fatal errors.
     */
     if (!$html || !is_object($html)) {
+        if ($debug) error_log("Failed to load " . $url . " into an object!");
         continue;
     }
 
     /*
       We now look for list elements with a class name that starts with "post-".  Example element:
-
-        <li class="post-26974">
-            <a href="/en/post/26974/Anime+Festival+Asia+Indonesia+2013.html" class="thumbnail post" style="width:75px;height:75px;" title="Anime Festival Asia Indonesia 2013"><img alt="Anime Festival Asia Indonesia 2013" height="75" src="http://farm4.staticflickr.com/3691/9148608379_b1cab35df6_s.jpg" width="75" /></a>
-            <div class="caption">
-                <h5><a href="/en/post/26974/Anime+Festival+Asia+Indonesia+2013.html" title="Anime Festival Asia Indonesia 2013">Anime Festival Asia Indonesia 2013</a></h5>
-                <p class="summary">See you at Anime Festival Asia Indonesia 2013 this September 6,7,8 which takes place at the Jakarta Con...</p>
-                <div class="meta">
-                    <div class="published-at">Thu 13/06/27</div>
-                    <a href="/en/post/26974/Anime+Festival+Asia+Indonesia+2013.html#comments" class="comments-link"><i class="icon-comment"></i> 38</a> <div class="pageviews "><i class="icon-fire"></i> 95580</div>
-                </div>
-            </div>
-        </li>
+        <div class="col-xs-6 col-sm-6 col-md-3 post-27287 thumbnail-small">
+          <a href="/en/post/27287/Smart+Doll+Plus.html" title="Smart Doll Plus">
+          <img alt="Smart Doll Plus" class="thumbnail-img" src="//images.dannychoo.com/cgm/images/post/20150331/27287/186107/medium/f02024d7614131c22a673d6163684672.jpg" />
+          </a>      <div class="caption">
+          <h4>
+            <a href="/en/post/27287/Smart+Doll+Plus.html" title="Smart Doll Plus">
+              Smart Doll Plus
+            </a>
+          </h4>
+        </div>
      */
-    foreach($html->find('li[class^="post-"]') as $element) {
-
+    $foundPost = false;
+    foreach($html->find('[class^="post-"]') as $element) {
         /*
-            Some list elements contain the "with-badge" class.  We don't want info from those!
-            <li class="post-26974 with-badge">
+            The URL and Title can be retreived from an H4 anchor element 
+            <h4>
+              <a href="/en/post/27287/Smart+Doll+Plus.html" title="Smart Doll Plus">
+                Smart Doll Plus
+              </a>
+            </h4>
          */
-        if (strpos($element->class, "with-badge")) {
-            continue;
-        }
-
-        /*
-            The URL and Title can be retreived from an anchor element with the "thumbnail post" class:
-            <a href="/en/post/26974/Anime+Festival+Asia+Indonesia+2013.html" class="thumbnail post" style="width:75px;height:75px;" title="Anime Festival Asia Indonesia 2013">
-         */
-        $a = $element->find('a[class="thumbnail post"]');
-        if ($a && $a[0]->title) {
-            $title = $a[0]->title;
-            $postUrl = $a[0]->href;
+        $a = $element->find('h4',0)->find('a',0);
+        if ($a && $a->title) {
+            if ($debug) error_log("Found post!  title: " . $a->title . " url: " . $a->href);
+            $foundPost = true;
         }
 
         // Insert results into the database.
-        if ($title && $dcps->checkUrl("http://www.dannychoo.com" . $postUrl)) {
-            $dcps->addPost($title, $postUrl);
+        if ($a->title && $dcps->checkUrl("http://www.dannychoo.com" . $a->href)) {
+            if ($debug) error_log("Storing post!  title: " . $a->title . " url: " . $a->href . ".  Also removing create_date and description!");
+            $dcps->addPost($a->title, $a->href);
+        }
+        else {
+            if ($debug) error_log("Unable to access post URL: " . $a->href);
         }
     }
 
@@ -110,6 +122,10 @@ for($i=1;$i<=PAGE_DEPTH;$i++) {
      */
     $html->clear();
     unset($html);
+    if ($debug && !$foundPost) {
+        error_log("Unable to locate posts.  Exiting!");
+        exit;
+    }
 }
 
 
@@ -119,25 +135,31 @@ for($i=1;$i<=PAGE_DEPTH;$i++) {
 */
 $posts = $dcps->getUnprocessedPosts();
 
+if ($debug) error_log("Getting info for " . count($posts) . " posts.");
+
 foreach ($posts as $post) {
     $url = "http://www.dannychoo.com" . $post['url'];
+    if ($debug) error_log("Geting meta info from " . $url);
 
     // Make sure web page exists.
     $urlExists = $dcps->checkUrl($url);
     if (!$urlExists) {
+        if ($debug) error_log("url: " . $url . " does not exist!  Deleting it and moving on.");
         // If it doesn't, delete it from the posts table.
         $dcps->deletePost($post['id']);
         continue;
     }
 
     // Build an object from html
-    $html = file_get_html($url);
+    $html = new simple_html_dom();
+    $html->load_file($url);
     
     /*
         We want to stop this loop if there is a problem getting 
         html.  Prevents fatal errors.
      */
     if (!$html || !is_object($html)) {
+        if ($debug) error_log("Failed to load " . $url . " into an object!");
         continue;
     }
 
@@ -161,7 +183,7 @@ foreach ($posts as $post) {
 
         <div class="category-trail"><a href="/en/posts/category/visit">Places to visit in Japan</a></div>
      */
-    $category = ( $html->find('div[class=category]', 0) ) ? $html->find('div[class=category]', 0) : $html->find('div[class=category-trail]', 0);
+    $category = ( $html->find('[class=category]', 0) ) ? $html->find('[class=category]', 0) : $html->find('[class=category-trail]', 0);
 
     $categoryInfo = (is_object($category)) ? $category->find('a', 0) : NULL;
     
@@ -183,7 +205,7 @@ foreach ($posts as $post) {
         Get create date as a unix timestamp.  Example:
         <div class="published-at">Wed 2013/07/03 04:37 JST</div>
      */
-    $date = $html->find('div[class="published-at"]', 0);
+    $date = $html->find('[class="published-at"]', 0);
     $createDate = (is_object($date)) ? strtotime($date->plaintext) : NULL;
 
     /*
@@ -203,3 +225,4 @@ foreach ($posts as $post) {
     $html->clear();
     unset($html);
 }
+if ($debug) error_log("Done!");
