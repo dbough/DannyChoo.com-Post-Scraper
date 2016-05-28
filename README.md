@@ -2,7 +2,7 @@ DannyChoo.com Post Scraper v0.2.1
 =================================
 DannyChoo.com Post Scraper is a PHP library that allows you to glean data from DannyChoo.com and store it in a MySQL database.  
 
-Check out http://danielbough.com/dc-api/ for an API that uses data gathered by this library.
+Check out http://dc-api.danielbough.com for an API that uses data gathered by this library.
 
 Data Gathered
 -------------  
